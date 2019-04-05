@@ -1,0 +1,18 @@
+[~[tlist_sql;
+select
+  '{ "type"' || chr(58) || ' "Feature"' || chr(44) || ' "properties"' || chr(58) || ' { "name"' || chr(58) || ' "' || s.lastfirst
+  || '"' || chr(44) || ' "student_number"' || chr(58) || ' "' || s.student_number
+  || '"' || chr(44) || ' "street"' || chr(58) || ' "' || s.street
+  || '"' || chr(44) || ' "grade_level"' || chr(58) || ' "' || s.grade_level
+  || '" }' || chr(44) || ' "geometry"' || chr(58) || ' { "type"' || chr(58) || ' "Point"' || chr(44) || ' "coordinates"' || chr(58) || ' ' || chr(91)
+  || trim(substr(s.geocode, - instr(reverse(s.geocode), chr(58)) + 1))
+  || chr(44) || ' '
+  || trim(substr(substr(s.geocode, 0, instr(s.geocode, chr(44)) - 1), instr(s.geocode, chr(58)) + 1))
+  || chr(93) || ' } }'
+from
+  ~[temp.table.current.selection:students] cs
+  left join students s
+    on s.dcid = cs.dcid
+where
+  s.geocode is not null
+]~(row),[/tlist_sql]{}]

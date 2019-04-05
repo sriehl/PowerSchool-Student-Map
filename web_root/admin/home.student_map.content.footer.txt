@@ -1,0 +1,12 @@
+
+<!-- Student Map Link -->
+
+<script>
+require(['jquery'], function($) {
+    $(function() {
+        $('#storedSelections').after('<a href="student_map/home.html">Student Map</a>');
+    });
+});
+</script>
+
+<!-- end Student Map Link -->

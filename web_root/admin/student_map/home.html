@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student Map</title>
+    <!-- required scripts -->
+    ~[wc:commonscripts]
+    <!-- Required style sheets: screen.css, and print.css -->
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+    <style>
+    #mapid {
+        padding: 0px;
+        height: calc(100vh - 135px);
+        top: -1px;
+        left: -1px;
+    }
+    </style>
+</head>
+
+<body>
+    ~[wc:admin_header_css]
+    <!-- breadcrumb start --><a href="/admin/home.html" target="_top">Start Page</a> &gt; Student Map
+    <!-- breadcrumb end -->
+    <!-- start of main menu and content -->
+    ~[wc:admin_navigation_css]
+    <!-- Start of Page -->
+    <!-- start of content area -->
+    <div id="mapid"></div>
+    <script>
+    require.config({
+        paths: {
+            'leaflet': 'https://unpkg.com/leaflet@1.4.0/dist/leaflet',
+            'markercluster': 'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster'
+        },
+        shim: {
+            'leaflet': {
+                exports: 'L'
+            },
+            'markercluster': {
+                deps: ['leaflet']
+            }
+        }
+    });
+    require(['jquery', 'leaflet', 'markercluster'], function($, L) {
+        var invalidMapping = function(msg) {
+            var map = document.getElementById('mapid');
+            map.style.padding = '20px';
+            map.className = '';
+            map.textContent = msg;
+            closeLoading();
+            return false;
+        }
+        if ('~[temp.table.current.selection:students]' === '') {
+            return invalidMapping('Plese go back to the start page and pick a selection of students');
+        }
+        loadingDialog();
+        var map = L.map('mapid');
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            minZoom: 8
+        }).addTo(map);
+
+        $.getJSON('data.json', function(data) {
+
+            data.pop();
+
+            data = data.filter(function(d) {
+                return d.geometry.coordinates.length === 2;
+            });
+
+            if (data.length === 0) {
+                return invalidMapping('No students with a valid geocode');
+            }
+
+            var geodata = L.geoJSON(data, {
+                onEachFeature: function(feature, layer) {
+                    layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>Student Number:</strong> ' + feature.properties.student_number + '<br><strong>Grade:</strong> ' + feature.properties.grade_level + '<br><strong>Street:</strong> ' + feature.properties.street + '</p>');
+                }
+            });
+
+            var markers = L.markerClusterGroup({
+                // disableClusteringAtZoom: 16
+                maxClusterRadius: 50
+            });
+            markers.addLayer(geodata);
+            map.addLayer(markers);
+
+            map.fitBounds(geodata.getBounds());
+
+            closeLoading();
+        });
+
+    });
+    </script>
+    <!-- end of content area -->
+    ~[wc:admin_footer_css]
+</body>
+
+</html>
