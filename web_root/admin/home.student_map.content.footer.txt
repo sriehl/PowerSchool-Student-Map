@@ -4,7 +4,7 @@
 <script>
 require(['jquery'], function($) {
     $(function() {
-        $('#storedSelections').after('<a href="student_map/home.html">Student Map</a>');
+        $('#storedSelections').after('<a href="student_map/home.html">~[text:psx.htmlc.admin.student_map.home.student_map]</a>');
     });
 });
 </script>

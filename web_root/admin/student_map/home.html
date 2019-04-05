@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Student Map</title>
+    <title>~[text:psx.htmlc.admin.student_map.home.student_map]</title>
     <!-- required scripts -->
     ~[wc:commonscripts]
     <!-- Required style sheets: screen.css, and print.css -->
@@ -23,7 +23,7 @@
 
 <body>
     ~[wc:admin_header_css]
-    <!-- breadcrumb start --><a href="/admin/home.html" target="_top">Start Page</a> &gt; Student Map
+    <!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin.home.start_page]</a> &gt; ~[text:psx.htmlc.admin.student_map.home.student_map]
     <!-- breadcrumb end -->
     <!-- start of main menu and content -->
     ~[wc:admin_navigation_css]
@@ -55,7 +55,7 @@
             return false;
         }
         if ('~[temp.table.current.selection:students]' === '') {
-            return invalidMapping('Plese go back to the start page and pick a selection of students');
+            return invalidMapping('~[text:psx.htmlc.admin.student_map.home.no_student_selection]');
         }
         loadingDialog();
         var map = L.map('mapid');
@@ -74,12 +74,12 @@
             });
 
             if (data.length === 0) {
-                return invalidMapping('No students with a valid geocode');
+                return invalidMapping('~[text:psx.htmlc.admin.student_map.home.no_students_with_a_valid_geocode]');
             }
 
             var geodata = L.geoJSON(data, {
                 onEachFeature: function(feature, layer) {
-                    layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>Student Number:</strong> ' + feature.properties.student_number + '<br><strong>Grade:</strong> ' + feature.properties.grade_level + '<br><strong>Street:</strong> ' + feature.properties.street + '</p>');
+                    layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>~[text:psx.htmlc.admin.student_map.home.student_number]:</strong> ' + feature.properties.student_number + '<br><strong>~[text:psx.htmlc.admin.student_map.home.grade]:</strong> ' + feature.properties.grade_level + '<br><strong>~[text:psx.htmlc.admin.student_map.home.street]:</strong> ' + feature.properties.street + '</p>');
                 }
             });
 
