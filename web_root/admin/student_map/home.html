@@ -46,6 +46,30 @@
         }
     });
     require(['jquery', 'leaflet', 'markercluster'], function($, L) {
+        // check for new version and display if there is
+        $.getJSON('https://api.github.com/repos/sriehl/PowerSchool-Student-Map/releases/latest').then(function(response){
+            const current_version = 'v~[tlist_sql;select version from plugindef where name = 'Student Map']~(version)[/tlist_sql]';
+            const latest_version = response.tag_name;
+            const version_control = document.createElement('div');
+            version_control.classList.add('leaflet-control-attribution');
+            version_control.classList.add('leaflet-control');
+
+            version_control.textContent = 'Student Map Version: ' + current_version;
+            // if edit on plugin page, show if there is an update
+            ~[if.security.pagemod=/admin/pluginconsole/plugInConsole.action]
+                if (current_version !== latest_version) {
+                    const new_version_link = document.createElement('a');
+                    new_version_link.href = 'https://github.com/sriehl/PowerSchool-Student-Map/releases/latest';
+                    new_version_link.target = '_blank';
+                    new_version_link.textContent = 'new version ' + latest_version;
+                    version_control.textContent = version_control.textContent + ' - ';
+                    version_control.append(new_version_link);
+                }
+            [/if]
+
+            document.querySelector('div.leaflet-bottom.leaflet-left').append(version_control);
+        });
+
         var invalidMapping = function(msg) {
             var map = document.getElementById('mapid');
             map.style.padding = '20px';
