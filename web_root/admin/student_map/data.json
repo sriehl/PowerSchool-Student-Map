@@ -1,3 +1,5 @@
+~[SetPostValue:dothisfor=selected]
+~[x:GetDoThisForStudents]
 [~[tlist_sql;
 select
   '{ "type"' || chr(58) || ' "Feature"' || chr(44) || ' "properties"' || chr(58) || ' { "name"' || chr(58) || ' "' || s.lastfirst
@@ -10,9 +12,12 @@ select
   || trim(substr(substr(s.geocode, 0, instr(s.geocode, chr(44)) - 1), instr(s.geocode, chr(58)) + 1))
   || chr(93) || ' } }'
 from
-  ~[temp.table.current.selection:students] cs
-  left join students s
-    on s.dcid = cs.dcid
+  students s
 where
-  s.geocode is not null
+    ~[if.~[ris;students]=0]
+      1 = 0
+    [else]
+      (~(f.list;list=~(f.table_info;table=Students;fn=value;field=ID;fieldtype=INT;delim=CMA;dothisfor=currentsel);fn=toInClause;value=s.ID))
+    [/if]
+    and s.geocode is not null
 ]~(row),[/tlist_sql]{}]

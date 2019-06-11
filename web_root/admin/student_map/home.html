@@ -34,7 +34,8 @@
     require.config({
         paths: {
             'leaflet': 'https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet',
-            'markercluster': 'https://cdn.jsdelivr.net/npm/leaflet.markercluster@1/dist/leaflet.markercluster'
+            'markercluster': 'https://cdn.jsdelivr.net/npm/leaflet.markercluster@1/dist/leaflet.markercluster',
+            'fetch': 'https://cdn.jsdelivr.net/npm/whatwg-fetch@3/dist/fetch.umd.min'
         },
         shim: {
             'leaflet': {
@@ -45,30 +46,7 @@
             }
         }
     });
-    require(['jquery', 'leaflet', 'markercluster'], function($, L) {
-        // check for new version and display if there is
-        $.getJSON('https://api.github.com/repos/sriehl/PowerSchool-Student-Map/releases/latest').then(function(response){
-            const current_version = 'v~[tlist_sql;select version from plugindef where name = 'Student Map']~(version)[/tlist_sql]';
-            const latest_version = response.tag_name;
-            const version_control = document.createElement('div');
-            version_control.classList.add('leaflet-control-attribution');
-            version_control.classList.add('leaflet-control');
-
-            version_control.textContent = 'Student Map Version: ' + current_version;
-            // if edit on plugin page, show if there is an update
-            ~[if.security.pagemod=/admin/pluginconsole/plugInConsole.action]
-                if (current_version !== latest_version) {
-                    const new_version_link = document.createElement('a');
-                    new_version_link.href = 'https://github.com/sriehl/PowerSchool-Student-Map/releases/latest';
-                    new_version_link.target = '_blank';
-                    new_version_link.textContent = 'new version ' + latest_version;
-                    version_control.textContent = version_control.textContent + ' - ';
-                    version_control.append(new_version_link);
-                }
-            [/if]
-
-            document.querySelector('div.leaflet-bottom.leaflet-left').append(version_control);
-        });
+    require(['leaflet', 'markercluster', 'fetch'], function(L) {
 
         var invalidMapping = function(msg) {
             var map = document.getElementById('mapid');
@@ -78,9 +56,16 @@
             closeLoading();
             return false;
         }
-        if ('~[temp.table.current.selection:students]' === '') {
+
+        /* IMPORTANT: do NOT modify this comment. These two PowerSchool commands are required for it to function.
+            ~[SetPostValue:dothisfor=selected]
+            ~[x:GetDoThisForStudents]
+        */
+
+        if (~[ris;students] === 0) {
             return invalidMapping('~[text:psx.htmlc.admin.student_map.home.no_student_selection]');
         }
+
         loadingDialog();
         var map = L.map('mapid');
 
@@ -88,35 +73,70 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        $.getJSON('data.json', function(data) {
+        fetch('data.json',)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                data.pop();
 
-            data.pop();
+                data = data.filter(function(d) {
+                    return d.geometry.coordinates.length === 2;
+                });
 
-            data = data.filter(function(d) {
-                return d.geometry.coordinates.length === 2;
-            });
-
-            if (data.length === 0) {
-                return invalidMapping('~[text:psx.htmlc.admin.student_map.home.no_students_with_a_valid_geocode]');
-            }
-
-            var geodata = L.geoJSON(data, {
-                onEachFeature: function(feature, layer) {
-                    layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>~[text:psx.htmlc.admin.student_map.home.student_number]:</strong> ' + feature.properties.student_number + '<br><strong>~[text:psx.htmlc.admin.student_map.home.grade]:</strong> ' + feature.properties.grade_level + '<br><strong>~[text:psx.htmlc.admin.student_map.home.street]:</strong> ' + feature.properties.street + '</p>');
+                if (data.length === 0) {
+                    return invalidMapping('~[text:psx.htmlc.admin.student_map.home.no_students_with_a_valid_geocode]');
                 }
-            });
 
-            var markers = L.markerClusterGroup({
-                // disableClusteringAtZoom: 16
-                maxClusterRadius: 50
-            });
-            markers.addLayer(geodata);
-            map.addLayer(markers);
+                var geodata = L.geoJSON(data, {
+                    onEachFeature: function(feature, layer) {
+                        layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>~[text:psx.htmlc.admin.student_map.home.student_number]:</strong> ' + feature.properties.student_number + '<br><strong>~[text:psx.htmlc.admin.student_map.home.grade]:</strong> ' + feature.properties.grade_level + '<br><strong>~[text:psx.htmlc.admin.student_map.home.street]:</strong> ' + feature.properties.street + '</p>');
+                    }
+                });
 
-            map.fitBounds(geodata.getBounds());
+                var markers = L.markerClusterGroup({
+                    // disableClusteringAtZoom: 16
+                    maxClusterRadius: 50
+                });
+                markers.addLayer(geodata);
+                map.addLayer(markers);
 
-            closeLoading();
-        });
+                map.fitBounds(geodata.getBounds());
+
+                closeLoading();
+            })
+            .then(function() {
+                // check for new version and display if there is
+                fetch('https://api.github.com/repos/sriehl/PowerSchool-Student-Map/releases/latest')
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        const current_version = 'v~[tlist_sql;select version from plugindef where name = 'Student Map']~(version)[/tlist_sql]';
+                        const latest_version = data.tag_name;
+                        const version_control = document.createElement('div');
+                        version_control.classList.add('leaflet-control-attribution');
+                        version_control.classList.add('leaflet-control');
+
+                        version_control.textContent = 'Student Map Version: ' + current_version;
+                        // if edit on plugin page, show if there is an update
+                        ~[if.security.pagemod=/admin/pluginconsole/plugInConsole.action]
+                            if (current_version !== latest_version) {
+                                const new_version_link = document.createElement('a');
+                                new_version_link.href = 'https://github.com/sriehl/PowerSchool-Student-Map/releases/latest';
+                                new_version_link.target = '_blank';
+                                new_version_link.textContent = 'new version ' + latest_version;
+                                version_control.textContent = version_control.textContent + ' - ';
+                                version_control.append(new_version_link);
+                            }
+                        [/if]
+
+                        document.querySelector('div.leaflet-bottom.leaflet-left').append(version_control);
+                    })
+                    .catch(function(e) {
+                        console.log(e);
+                    });
+            })
 
     });
     </script>
