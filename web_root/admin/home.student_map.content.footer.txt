@@ -4,7 +4,12 @@
 <script>
 require(['jquery'], function($) {
     $(function() {
-        $('#storedSelections').after('<a href="student_map/home.html">~[text:psx.htmlc.admin.student_map.home.student_map]</a>');
+        const link = '<a href="student_map/home.html">~[text:psx.htmlc.admin.student_map.home.student_map]</a>';
+        if (typeof angularCustomizations !== "undefined") {
+            angularCustomizations.addCustomization('pss-studentsearch', {'after': '#advancedModeToggleBtnstudents', 'element': link})
+        } else {
+            $('#storedSelections').after(link);
+        }
     });
 });
 </script>
