@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<plugin xmlns="http://plugin.powerschool.pearson.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd" name="Student Map" version="1.0.2" description="Add a link to map your currently selected students.">
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd" name="Student Map" version="1.0.3" description="Add a link to map your currently selected students.">
   <access_request>
     <cdn_request>
       <cdn name="https://cdn.jsdelivr.net"/>
+      <cdn name="https://*.tile.openstreetmap.org"/>
     </cdn_request>
   </access_request>
   <publisher name="Steven Riehl">
