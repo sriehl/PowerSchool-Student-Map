@@ -1,10 +1,26 @@
 
 <!-- Student Map Link -->
 
+<style>
+    #studentMapLink {
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        min-width: 0.75em;
+        border-radius: 4px;
+        text-align: center;
+        padding: 0 0.4em;
+    }
+
+    #studentMapLink:hover {
+        background-color: #a3bfcc;
+    }
+</style>
+
 <script>
 require(['jquery'], function($) {
     $(function() {
-        const link = '<a href="student_map/home.html">~[text:psx.htmlc.admin.student_map.home.student_map]</a>';
+        const link = '<a id="studentMapLink" href="student_map/home.html">~[text:psx.htmlc.admin.student_map.home.student_map]</a>';
         if (typeof angularCustomizations !== "undefined") {
             angularCustomizations.addCustomization('pss-studentsearch', {'after': '#advancedModeToggleBtnstudents', 'element': link})
         } else {
