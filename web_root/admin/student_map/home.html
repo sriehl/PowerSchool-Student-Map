@@ -34,7 +34,7 @@
     require.config({
         paths: {
             'leaflet': 'https://cdn.jsdelivr.net/npm/leaflet@1/dist/leaflet',
-            'markercluster': 'https://cdn.jsdelivr.net/npm/leaflet.markercluster@1/dist/leaflet.markercluster',
+            'markercluster': 'https://cdn.jsdelivr.net/npm/leaflet.markercluster@1/dist/leaflet.markercluster-src.min',
             'fetch': 'https://cdn.jsdelivr.net/npm/whatwg-fetch@3/dist/fetch.umd.min'
         },
         shim: {
@@ -88,13 +88,13 @@
                     return invalidMapping('~[text:psx.htmlc.admin.student_map.home.no_students_with_a_valid_geocode]');
                 }
 
-                var geodata = L.geoJSON(data, {
+                let geodata = L.geoJSON(data, {
                     onEachFeature: function(feature, layer) {
                         layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>~[text:psx.htmlc.admin.student_map.home.student_number]:</strong> ' + feature.properties.student_number + '<br><strong>~[text:psx.htmlc.admin.student_map.home.grade]:</strong> ' + feature.properties.grade_level + '<br><strong>~[text:psx.htmlc.admin.student_map.home.street]:</strong> ' + feature.properties.street + '</p>');
                     }
                 });
 
-                var markers = L.markerClusterGroup({
+                let markers = window.L.markerClusterGroup({
                     // disableClusteringAtZoom: 16
                     maxClusterRadius: 50
                 });
