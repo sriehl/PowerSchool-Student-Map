@@ -2,22 +2,43 @@
 ~[x:GetDoThisForStudents]
 [~[tlist_sql;
 select
-  '{ "type"' || chr(58) || ' "Feature"' || chr(44) || ' "properties"' || chr(58) || ' { "name"' || chr(58) || ' "' || s.lastfirst
-  || '"' || chr(44) || ' "student_number"' || chr(58) || ' "' || s.student_number
-  || '"' || chr(44) || ' "street"' || chr(58) || ' "' || s.street
-  || '"' || chr(44) || ' "grade_level"' || chr(58) || ' "' || s.grade_level
-  || '" }' || chr(44) || ' "geometry"' || chr(58) || ' { "type"' || chr(58) || ' "Point"' || chr(44) || ' "coordinates"' || chr(58) || ' ' || chr(91)
-  || trim(substr(s.geocode, - instr(reverse(s.geocode), chr(58)) + 1))
-  || chr(44) || ' '
-  || trim(substr(substr(s.geocode, 0, instr(s.geocode, chr(44)) - 1), instr(s.geocode, chr(58)) + 1))
-  || chr(93) || ' } }'
+  json_object(
+      'type' value 'Feature'
+    , 'properties' value json_object(
+        'dcid' value students.dcid
+      , 'name' value students.lastfirst
+      , 'student_number' value students.student_number
+      , 'street' value students.street
+      , 'grade_level' value students.grade_level
+      , 'school' value schools.name
+    )
+    , 'geometry' value json_object(
+        'type' value 'Point'
+      , 'coordinates' value json_array(personaddress.geocodelongitude, personaddress.geocodelatitude)
+    )
+  )
+  , lead (',') over (order by null)
 from
-  students s
+  students
+  left join person
+    on person.id = students.person_id
+  left join personaddressassoc
+    on personaddressassoc.personid = person.id
+  left join codeset addresstype
+    on addresstype.codetype = 'Address'
+    and addresstype.codesetid = personaddressassoc.addresstypecodesetid
+  left join personaddress
+    on personaddress.personaddressid = personaddressassoc.personaddressid
+  left join schools
+    on schools.school_number = students.schoolid
 where
-    ~[if.~[ris;students]=0]
-      1 = 0
-    [else]
-      (~(f.list;list=~(f.table_info;table=Students;fn=value;field=ID;fieldtype=INT;delim=CMA;dothisfor=currentsel);fn=toInClause;value=s.ID))
-    [/if]
-    and s.geocode is not null
-]~(row),[/tlist_sql]{}]
+      addresstype.code = 'Home'
+  and personaddress.geocodelatitude is not null
+  and personaddress.geocodelongitude is not null
+  and students.enroll_status = 0
+  ~[if.~[ris;students]=0]
+    and 1 = 0
+  [else]
+    and (~(f.list;list=~(f.table_info;table=Students;fn=value;field=ID;fieldtype=INT;delim=CMA;dothisfor=currentsel);fn=toInClause;value=students.id))
+  [/if]
+]~(row)~(delim)[/tlist_sql]]

@@ -78,8 +78,6 @@
                 return response.json();
             })
             .then(function(data) {
-                data.pop();
-
                 data = data.filter(function(d) {
                     return d.geometry.coordinates.length === 2;
                 });
@@ -90,7 +88,14 @@
 
                 let geodata = L.geoJSON(data, {
                     onEachFeature: function(feature, layer) {
-                        layer.bindPopup('<h2>' + feature.properties.name + '</h2><p><strong>~[text:psx.htmlc.admin.student_map.home.student_number]:</strong> ' + feature.properties.student_number + '<br><strong>~[text:psx.htmlc.admin.student_map.home.grade]:</strong> ' + feature.properties.grade_level + '<br><strong>~[text:psx.htmlc.admin.student_map.home.street]:</strong> ' + feature.properties.street + '</p>');
+                        layer.bindPopup(`
+                            <h2 style="margin: 0px;"><a href="/admin/students/home.html?frn=001${feature.properties.dcid}" target="_new">${feature.properties.name}</a></h2>
+                            <p>
+                                <strong>~[text:psx.htmlc.admin.student_map.home.school]:</strong> ${feature.properties.school}<br>
+                                <strong>~[text:psx.htmlc.admin.student_map.home.student_number]:</strong> ${feature.properties.student_number}<br>
+                                <strong>~[text:psx.htmlc.admin.student_map.home.grade]:</strong> ${feature.properties.grade_level}<br>
+                                <strong>~[text:psx.htmlc.admin.student_map.home.street]:</strong> ${feature.properties.street}
+                            </p>`);
                     }
                 });
 
