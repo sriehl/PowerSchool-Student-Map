@@ -1,6 +1,7 @@
 ~[SetPostValue:dothisfor=selected]
 ~[x:GetDoThisForStudents]
-[~[tlist_sql;
+[~[if#STU_MAP_SECURITY.security.inrole=~[pref:student-map-sec-group]]
+  ~[tlist_sql;
 select
   json_object(
       'type' value 'Feature'
@@ -41,4 +42,5 @@ where
   [else]
     and (~(f.list;list=~(f.table_info;table=Students;fn=value;field=ID;fieldtype=INT;delim=CMA;dothisfor=currentsel);fn=toInClause;value=students.id))
   [/if]
-]~(row)~(delim)[/tlist_sql]]
+]~(row)~(delim)[/tlist_sql]
+[/if#STU_MAP_SECURITY]]

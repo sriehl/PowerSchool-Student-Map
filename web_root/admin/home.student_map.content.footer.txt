@@ -1,6 +1,6 @@
 
 <!-- Student Map Link -->
-
+~[if#STU_MAP_SECURITY.security.inrole=~[pref:student-map-sec-group]]
 <style>
     #studentMapLink {
         display: inline-block;
@@ -29,5 +29,5 @@ require(['jquery'], function($) {
     });
 });
 </script>
-
+[/if#STU_MAP_SECURITY]
 <!-- end Student Map Link -->

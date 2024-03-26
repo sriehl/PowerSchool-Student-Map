@@ -1,0 +1,13 @@
+{
+  "pages": [
+    {
+      "htmlID": "ps-student-map-settings",
+      "title": "Student Map Settings",
+      "sortOrder": 100,
+      "pageURL": "/admin/student_map/settings.html",
+      "districtLevelContext": 0,
+      "version": "24.03.01",
+      "parentHTMLID": "navSystemManagementCustomizations"
+    }
+  ]
+}
