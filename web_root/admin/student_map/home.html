@@ -29,6 +29,7 @@
     ~[wc:admin_navigation_css]
     <!-- Start of Page -->
     <!-- start of content area -->
+    ~[if#STU_MAP_SECURITY.security.inrole=~[pref:student-map-sec-group]]
     <div id="mapid"></div>
     <script>
     require.config({
@@ -145,6 +146,7 @@
 
     });
     </script>
+    [/if#STU_MAP_SECURITY]
     <!-- end of content area -->
     ~[wc:admin_footer_css]
 </body>

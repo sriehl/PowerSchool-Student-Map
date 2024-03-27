@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<!-- non framed -->
+
+<head>
+  <title>PowerSchool Student Map Settings</title>
+  ~[wc:commonscripts]
+  <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+  <link href="/images/css/print.css" rel="stylesheet" media="print">
+
+  <style type="text/css">
+    .dfd {
+      max-width: 1400px;
+      width: 100%;
+    }
+  </style>
+
+
+
+</head>
+
+<body>
+  ~[wc:admin_header_css]
+  <!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin.home.start_page]</a> &gt;
+  ~[text:psx.htmlc.admin.student_map.home.student_map_settings]
+  <!-- breadcrumb end -->
+  <!-- start of main menu and content -->
+  ~[wc:admin_navigation_css]
+  <!-- Start of Page -->
+  <!-- start of content area -->
+
+  <div class="box-round" style="max-width: 1200px;">
+
+    <form action="/admin/changesrecorded.white.html" method="POST">
+      ~[if#MISCACCESS.security.pagemod=/admin/district/misc-district.html]
+      <h3 id="header">~[text:psx.htmlc.admin.student_map.home.student_map_settings]</h3>
+      <table id="table" class="linkDescList">
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <b>Enter a comma-separated list of group IDs which should have access to the Student Map plugin (e.g. "9" or
+                "1,3,9"). Only numbers and commas should be entered, no spaces or other characters.</b>
+              <h4 class="toggle collapsed">Group List</h4>
+              <table class="grid">
+                <thead>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ~[tlist_sql;select id, name from gen where upper(cat)='GROUPS' order by id;]<tr>
+                    <td><input id="group-~(ID;t)" type="checkbox" value="~(ID;t)" class="group pref-checkbox"></td>
+                    <td>~(ID;t)</td>
+                    <td>~(Name;t)</td>
+                  </tr>[/tlist_sql]
+                </tbody>
+              </table>
+            </td>
+            <td>
+              <input class="group-pref" name="[pref]student-map-sec-group" value="" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+      <div class="button-row">
+        <input type="hidden" name="ac" value="prim">~[submitbutton]
+      </div>
+
+      <script>
+        $j('.button-row').before($j('#header')).before($j('#table'));
+
+
+        // Initialize Checkboxes from existing pref value
+        $j(function () {
+          // Get any existing values
+          const init_groups = $j('.group-pref').val().split(',');
+
+          // Check the corresponding checkboxese
+          init_groups.forEach(e => $j('#group-' + e).prop('checked', true));
+
+        });
+
+        function updatePrefList() {
+          // Get the type of preference
+          const pref_type = $j(this).attr('class').replace('pref-checkbox', '').trim();
+          var options = [];
+
+          // Iterate all checkboxes of that type
+          $j('.' + pref_type).each(function (i) {
+            if ($j(this).prop('checked')) {
+              options.push($j(this).val());
+            }
+          });
+
+          // Update the actual preference field with a properly formatted string
+          $j('.' + pref_type + '-pref').val(options.join(','));
+
+        }
+
+        $j('.pref-checkbox').change(updatePrefList);
+
+      </script>
+      [/if#MISCACCESS]
+    </form>
+  </div>
+
+  ~[wc:admin_footer_css]
+</body>
+
+</html>
